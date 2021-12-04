@@ -14,7 +14,7 @@ from gs_interfaces.srv import ParametersList, ParametersListResponse
 from gs_interfaces.srv import SetParametersList, SetParametersListResponse
 from gs_interfaces.srv import Wait, WaitResponse
 from gs_interfaces.msg import SimpleBatteryState, OptVelocity
-from std_msgs.msg import Float32, Int32
+from std_msgs.msg import Float32, Int32, ColorRGBA
 from geometry_msgs.msg import Point
 from std_srvs.srv import Empty, EmptyResponse
 from std_srvs.srv import SetBool, SetBoolResponse
@@ -75,6 +75,8 @@ class ROSSimNode(): # класс ноды ros_plaz_node
         self.opt_velocity_publisher = Publisher("geoscan/navigation/opt/velocity", OptVelocity, queue_size=10) # издатель темы ускорения в OPT
 
         self.callback_event_publisher = Publisher("geoscan/flight/callback_event", Int32, queue_size=10) # издатель темы событий, возвращаемых АП
+
+        self.led_publisher = Publisher("geoscan/led/module/color", ColorRGBA, queue_size=10)
 
         self.camera_publisher = Publisher("pioneer_max_camera/image_raw/compressed", CompressedImage, queue_size=10)
 
@@ -173,6 +175,7 @@ class ROSSimNode(): # класс ноды ros_plaz_node
         return YawResponse(True) # возвращаем True - команда выполнена
 
     def handle_led(self, request): # функция обработки запроса на изменение цвета светодиодов на LED-модуле
+        self.led_publisher.publish(request.leds[0])
         return LedResponse(True) # возвращаем True - команда выполнена
 
     def handle_get_navigation_system(self, request): # функция обработки запроса на получение текущей системы навигации
@@ -243,6 +246,5 @@ if __name__ == "__main__":
     rate = rospy.Rate(100)
     ros_plaz_node = ROSSimNode(rate, x, y, z)
 
-    while not rospy.is_shutdown():
-        if not ros_plaz_node.spin():
-            break
+    while not rospy.is_shutdown() and ros_plaz_node.spin():
+        pass
