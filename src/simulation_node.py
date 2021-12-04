@@ -12,6 +12,7 @@ from gs_interfaces.srv import Position,PositionResponse
 from gs_interfaces.srv import Yaw, YawResponse
 from gs_interfaces.srv import ParametersList, ParametersListResponse
 from gs_interfaces.srv import SetParametersList, SetParametersListResponse
+from gs_interfaces.srv import Wait, WaitResponse
 from gs_interfaces.msg import SimpleBatteryState, OptVelocity
 from std_msgs.msg import Float32, Int32
 from geometry_msgs.msg import Point
@@ -59,6 +60,7 @@ class ROSSimNode(): # класс ноды ros_plaz_node
         self.local_position_service = Service("geoscan/flight/set_local_position", Position, self.handle_local_pos) # сервис полета в локальную точку
         self.yaw_service = Service("geoscan/flight/set_yaw", Yaw, self.handle_yaw) # сервис управления рысканьем
         self.event_service = Service("geoscan/flight/set_event", Event, self.handle_event) # севрис управления событиями АП
+        self.wait_service = Service("geoscan/flight/set_wait", Wait, self.handle_wait)
 
         self.module_led_service = Service("geoscan/led/module/set", Led, self.handle_led) # сервис управления светодиодами на LED-модуле
 
@@ -128,11 +130,19 @@ class ROSSimNode(): # класс ноды ros_plaz_node
                 self.yaw = new_angle
                 sleep(0.03)
 
+    def __wait(self, seconds):
+        sleep(seconds)
+        self.callback_event_publisher.publish(9)
+
     def handle_restart(self, request): # функция обработки запроса на перезагрузку
         return EmptyResponse() # возвращаем пустой ответ
 
     def handle_live(self, request): 
         return LiveResponse(self.live)
+
+    def handle_wait(self, request):
+        Thread(target=self.__wait, args=(request.seconds,)).start()
+        return WaitResponse(True)
 
     def handle_event(self, request): # функция обработки запроса на отправление события в АП
         if self.state_event != request.event:
