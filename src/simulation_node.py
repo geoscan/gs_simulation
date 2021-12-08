@@ -36,6 +36,8 @@ class ROSSimNode(): # класс ноды ros_plaz_node
         self.rate = rate # таймер
         self.camera_status = False
 
+        self.__misssions = []
+
         self.preflight_state = False
         self.takeoff_state = False
 
@@ -106,21 +108,27 @@ class ROSSimNode(): # класс ноды ros_plaz_node
         self.preflight_state = False
 
     def __go_to_point(self, x, y, z):
+        while len(self.__misssions) > 1:
+            pass
         delta_x = x - self.x
         delta_y = y - self.y
         delta_z = z - self.z
         l = sqrt(delta_x**2 + delta_y**2 + delta_z**2)
         for _ in range(0,int(l*100) - 1):
-            self.x += delta_x / l * 0.01
-            self.y += delta_y / l * 0.01
-            self.z += delta_z / l * 0.01
-            sleep(0.03)
-
+            if len(self.__misssions) <= 1:
+                self.x += delta_x / l * 0.01
+                self.y += delta_y / l * 0.01
+                self.z += delta_z / l * 0.01
+                sleep(0.03)
+            else:
+                self.__misssions.pop(0)
+                return
         self.callback_event_publisher.publish(5)
         self.x += x - self.x
         self.y += y - self.y
         self.z += z - self.z
         self.callback_event_publisher.publish(4)
+        self.__misssions.pop(0)
 
     def __update_yaw(self, angle):
         if self.takeoff_state:
@@ -166,7 +174,9 @@ class ROSSimNode(): # класс ноды ros_plaz_node
     def handle_local_pos(self, request): # функция обработки запроса на полет в локальную точку
         request_position = [request.position.x, request.position.y, request.position.z] # запоминаем координаты точки из запроса
         if self.takeoff_state: # сравниваем координаты точки с предыдущими координатами
-            Thread(target=self.__go_to_point, args = [request_position[0], request_position[1], request_position[2]]).start()
+            mission = Thread(target=self.__go_to_point, args = [request_position[0], request_position[1], request_position[2]])
+            self.__misssions.append(mission)
+            mission.start()
             self.state_position = request_position
         return PositionResponse(True) # возвращаем True - команда выполнена
 
