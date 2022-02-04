@@ -7,6 +7,7 @@ from rospy import Publisher, Service, ServiceProxy
 from geometry_msgs.msg import Point
 from std_srvs.srv import SetBool, SetBoolResponse
 from std_srvs.srv import Empty, EmptyResponse
+from std_srvs.srv import Trigger
 from threading import Thread
 from copy import deepcopy
 
@@ -32,9 +33,9 @@ class CarSimulationNode:
         self.__continue_service = Service("continue", Empty, self.handle_continue)
 
         rospy.wait_for_service("pause")
-        self.__pause_service_proxy = ServiceProxy("pause", Empty)
+        self.__pause_service_proxy = ServiceProxy("pause", Trigger)
         self.__position_publisher = Publisher("position", Point, queue_size=10)
-        self.timer = Thread(target=self.timer_targer)
+        self.timer = Thread(target=self.timer_target)
         self.timer.start()
         
     def handle_run(self, request):
@@ -48,7 +49,7 @@ class CarSimulationNode:
         self.__start_time = rospy.Time.now().to_sec()
         return EmptyResponse()
 
-    def timer_targer(self):
+    def timer_target(self):
         old_time = rospy.Time.now().to_sec()
         while not rospy.is_shutdown():
             new_time = rospy.Time.now().to_sec()
