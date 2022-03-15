@@ -1,8 +1,8 @@
 <launch>
     <node pkg="gs_simulation" type="simulation_node.py" name="simulation_node">
-        <param name="start_x" value="3.5"/>
-        <param name="start_y" value="4.5"/>
-        <param name="start_z" value="1.2"/>
+        <param name="start_x" value="4.27"/>
+        <param name="start_y" value="3.59"/>
+        <param name="start_z" value="0.85"/>
     </node>
     <node pkg="gs_simulation" type="simple_visualization_node.py" name="simple_visualization_node"/>
     <node pkg="gs_simulation" type="object_visualization_node.py" name="object_visualization_node"/>
