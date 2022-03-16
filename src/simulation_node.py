@@ -189,7 +189,7 @@ class ROSSimNode(): # класс ноды ros_plaz_node
 
     def handle_local_pos(self, request): # функция обработки запроса на полет в локальную точку
         request_position = [request.position.x, request.position.y, request.position.z] # запоминаем координаты точки из запроса
-        if self.takeoff_state: # сравниваем координаты точки с предыдущими координатами
+        if (self.takeoff_state) and (self.state_position != request_position): # сравниваем координаты точки с предыдущими координатами
             Thread(target=self.__go_to_point, args = [request_position[0], request_position[1], request_position[2]]).start()
             self.state_position = request_position
         return PositionResponse(True) # возвращаем True - команда выполнена
