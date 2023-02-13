@@ -1,9 +1,8 @@
 <launch>
-    <node pkg="gs_simulation" type="simulation_node.py" name="simulation_node">
-        <param name="start_x" value="4.27"/>
-        <param name="start_y" value="3.59"/>
-        <param name="start_z" value="0.85"/>
-    </node>
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+        <arg name="port" value="6666"/>
+        <!-- <arg name="address" value="10.211.55.5"/> -->
+    </include>
+    <node pkg="gs_simulation" type="simulation_node.py" name="simulation_node"/>
     <node pkg="gs_simulation" type="simple_visualization_node.py" name="simple_visualization_node"/>
-    <node pkg="gs_simulation" type="object_visualization_node.py" name="object_visualization_node"/>
 </launch>

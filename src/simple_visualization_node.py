@@ -4,7 +4,7 @@
 import rospy, rospkg
 from rospy import Subscriber, Publisher
 from geometry_msgs.msg import Point
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, ColorRGBA
 from visualization_msgs.msg import Marker
 from math import radians, cos, sin
 
@@ -23,14 +23,15 @@ class SimpleVisualizationNode(): # класс ноды визуализации
         self.copter_marker.scale.z = 0.1 # устанавливаем размер по координате Z
         self.copter_marker.pose.orientation.x = cos(radians(90)) # устанавливаем направление маркера по координате X
         self.copter_marker.pose.orientation.y = sin(radians(-90)) # устанавливаем направление маркера по координате Y
-        self.copter_marker.color.r = 1 # устанавлием красный канал цвета маркера
-        self.copter_marker.color.g = 0.48 # устанавлием зеленый канал цвета маркера
-        self.copter_marker.color.b = 0.02 # устанавлием синий канал цвета маркера
+        self.copter_marker.color.r = 0.52 # устанавлием красный канал цвета маркера
+        self.copter_marker.color.g = 0.52 # устанавлием зеленый канал цвета маркера
+        self.copter_marker.color.b = 0.52 # устанавлием синий канал цвета маркера
         self.copter_marker.color.a = 1.0 # устанавливаем прозрачность маркера, 1 - не прозрачный
         self.copter_marker.type = self.copter_marker.ARROW # задаем тип маркера, MESH_RESOURCE - маркер ввиде 3D модели
         
         self.position_subscriber = Subscriber("geoscan/navigation/local/position", Point, self.__position_callback)
         self.yaw_subscriber = Subscriber("geoscan/navigation/local/yaw", Float32, self.__yaw_callback)
+        self.color_subscriber = Subscriber("simulation/color", ColorRGBA, self.__color_callback)
 
     def __position_callback(self, position): # функция обработки новых сообщений топика позиции пионера в LPS
         self.copter_marker.pose.position.x = position.x # запоминаем координату X
@@ -40,6 +41,10 @@ class SimpleVisualizationNode(): # класс ноды визуализации
     def __yaw_callback(self, angle):
         self.copter_marker.pose.orientation.x = cos(radians(angle.data))
         self.copter_marker.pose.orientation.y = sin(radians(angle.data))
+
+    def __color_callback(self, color):
+        color.a = 1.0
+        self.copter_marker.color = color
 
     def spin(self):
         self.copter_marker.header.seq += 1

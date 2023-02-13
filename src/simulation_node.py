@@ -17,7 +17,7 @@ from gs_interfaces.srv import Yaw, YawResponse
 from gs_interfaces.srv import ParametersList, ParametersListResponse
 from gs_interfaces.srv import SetParametersList, SetParametersListResponse
 from gs_interfaces.msg import SimpleBatteryState, OptVelocity, PointGPS, SatellitesGPS, Orientation
-from std_msgs.msg import Float32, Int32, String, Int8
+from std_msgs.msg import Float32, Int32, String, Int8, ColorRGBA
 from geometry_msgs.msg import Point
 from std_srvs.srv import Empty, EmptyResponse
 from std_srvs.srv import SetBool, SetBoolResponse
@@ -49,6 +49,8 @@ class ROSSimNode(): # класс ноды ros_plaz_node
         self.y = start_y
         self.z = start_z
         self.yaw = 90.0
+
+        self.start_position_service = Service("simulation/set_start", Position, self.handle_start_position)
 
         self.logger = Service("geoscan/get_log", Log, self.handle_log) 
         self.alive = Service("geoscan/alive", Live, self.handle_live) # сервис, показывающий состояние подключения
@@ -94,6 +96,8 @@ class ROSSimNode(): # класс ноды ros_plaz_node
         self.altitude_publisher = Publisher("geoscan/sensors/altitude", Float32, queue_size=10)
         self.mag_publisher = Publisher("geoscan/sensors/mag", Point, queue_size=10)
 
+        self.color_publisher = Publisher("simulation/color", ColorRGBA, queue_size=10)
+
     def __preflight(self):
         sleep(0.5)
         self.preflight_state = True
@@ -116,6 +120,13 @@ class ROSSimNode(): # класс ноды ros_plaz_node
             self.callback_event_publisher.publish(1)
         else:
             self.callback_event_publisher.publish(0)
+        self.takeoff_state = False
+        self.preflight_state = False
+
+    def __disarm(self):
+        self.x = self.__start_x
+        self.y = self.__start_y
+        self.z = self.__start_z
         self.takeoff_state = False
         self.preflight_state = False
 
@@ -149,6 +160,12 @@ class ROSSimNode(): # класс ноды ros_plaz_node
     def __get_time(self):
         return rospy.Time().now().to_sec()
 
+    def handle_start_position(self, request):
+        self.__start_x = request.position.x
+        self.__start_y = request.position.y
+        self.__start_z = request.position.z
+        self.__disarm()
+
     def handle_restart(self, request): # функция обработки запроса на перезагрузку
         return EmptyResponse() # возвращаем пустой ответ
 
@@ -179,11 +196,7 @@ class ROSSimNode(): # класс ноды ros_plaz_node
                 elif request.event == 2:
                     Thread(target=self.__landing).start()
                 elif request.event == 3:
-                    self.x = self.__start_x
-                    self.y = self.__start_y
-                    self.z = self.__start_z
-                    self.takeoff_state = False
-                    self.preflight_state = False
+                    self.__disarm()
                 self.state_event = request.event
         return EventResponse(1)
 
@@ -202,6 +215,7 @@ class ROSSimNode(): # класс ноды ros_plaz_node
         return YawResponse(True) # возвращаем True - команда выполнена
 
     def handle_led(self, request): # функция обработки запроса на изменение цвета светодиодов на LED-модуле
+        self.color_publisher.publish(request.leds[0])
         return LedResponse(True) # возвращаем True - команда выполнена
 
     def handle_get_navigation_system(self, request): # функция обработки запроса на получение текущей системы навигации
