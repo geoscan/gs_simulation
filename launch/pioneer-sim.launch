@@ -1,4 +1,8 @@
 <launch>
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+        <arg name="port" value="6666"/>
+        <arg name="address" value="localhost"/>
+    </include>
     <node pkg="gs_simulation" type="simulation_node.py" name="simulation_node"/>
     <node pkg="gs_simulation" type="simple_visualization_node.py" name="simple_visualization_node"/>
 </launch>
