@@ -165,6 +165,7 @@ class ROSSimNode(): # класс ноды ros_plaz_node
         self.__start_y = request.position.y
         self.__start_z = request.position.z
         self.__disarm()
+        return PositionResponse(True)
 
     def handle_restart(self, request): # функция обработки запроса на перезагрузку
         return EmptyResponse() # возвращаем пустой ответ
