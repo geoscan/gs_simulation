@@ -27,7 +27,8 @@ class SimpleVisualizationNode(): # класс ноды визуализации
         self.copter_marker.color.g = 0.52 # устанавлием зеленый канал цвета маркера
         self.copter_marker.color.b = 0.52 # устанавлием синий канал цвета маркера
         self.copter_marker.color.a = 1.0 # устанавливаем прозрачность маркера, 1 - не прозрачный
-        self.copter_marker.type = self.copter_marker.ARROW # задаем тип маркера, MESH_RESOURCE - маркер ввиде 3D модели
+        self.copter_marker.type = self.copter_marker.MESH_RESOURCE # задаем тип маркера, MESH_RESOURCE - маркер ввиде 3D модели
+        self.copter_marker.mesh_resource = f"file://{self.path}/model/drone.stl" # задаем файл 3D модели
         
         self.position_subscriber = Subscriber("geoscan/navigation/local/position", Point, self.__position_callback)
         self.yaw_subscriber = Subscriber("geoscan/navigation/local/yaw", Float32, self.__yaw_callback)
