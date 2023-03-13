@@ -6,4 +6,5 @@
     </node>
     <node pkg="gs_simulation" type="simple_visualization_node.py" name="simple_visualization_node"/>
     <node pkg="gs_simulation" type="object_visualization_node.py" name="object_visualization_node"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find gs_simulation)/rviz/pioneer-sim.rviz"/>
 </launch>
