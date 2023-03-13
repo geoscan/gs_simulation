@@ -18,9 +18,9 @@ class SimpleVisualizationNode(): # класс ноды визуализации
         self.copter_marker = Marker() # создаем объект класса маркеров
         self.copter_marker.header.frame_id = "map" # указываем имя протсранства для отображения, задается в rviz - в конкретно этом случае map
         self.copter_marker.id = 0 # заполянем айди маркера
-        self.copter_marker.scale.x = 0.01 # устанавливаем размер по координате X
-        self.copter_marker.scale.y = 0.01 # устанавливаем размер по координате Y
-        self.copter_marker.scale.z = 0.01 # устанавливаем размер по координате Z
+        self.copter_marker.scale.x = 0.005 # устанавливаем размер по координате X
+        self.copter_marker.scale.y = 0.005 # устанавливаем размер по координате Y
+        self.copter_marker.scale.z = 0.005 # устанавливаем размер по координате Z
         self.copter_marker.pose.orientation.x = cos(radians(90)) # устанавливаем направление маркера по координате X
         self.copter_marker.pose.orientation.y = sin(radians(-90)) # устанавливаем направление маркера по координате Y
         self.copter_marker.color.r = 0.52 # устанавлием красный канал цвета маркера
