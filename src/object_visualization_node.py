@@ -24,8 +24,8 @@ class ObjectVisualizationNode:
                 marker.scale.x = objects[i]["scale"]["x"]
                 marker.scale.y = objects[i]["scale"]["y"]
                 marker.scale.z = objects[i]["scale"]["z"]
-                marker.pose.position.x = objects[i]["position"]["x"] + objects[i]["scale"]["x"] / 2
-                marker.pose.position.y = objects[i]["position"]["y"] + objects[i]["scale"]["y"] / 2
+                marker.pose.position.x = objects[i]["position"]["x"]
+                marker.pose.position.y = objects[i]["position"]["y"]
                 marker.pose.position.z = objects[i]["scale"]["z"] / 2 
                 marker.color.r = 0.86
                 marker.color.g = 0.86
